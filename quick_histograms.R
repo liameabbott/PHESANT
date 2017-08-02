@@ -7,13 +7,8 @@ trim <- function (x) {
 remove_excess_whitespace <- function(x) x <- gsub("\\s+", " ", x)
 
 # Read in all the data table codings
-<<<<<<< HEAD
-to_read <- paste("PHESANT/WAS/codings/",
-	dir("PHESANT/WAS/codings"), sep="")
-=======
 to_read <- paste("./WAS/codings/",
 	dir("./WAS/codings"), sep="")
->>>>>>> updated quick_histograms to process in one chunk
 codings_tables <- list()
 
 for(i in to_read) {
