@@ -7,8 +7,13 @@ trim <- function (x) {
 remove_excess_whitespace <- function(x) x <- gsub("\\s+", " ", x)
 
 # Read in all the data table codings
+<<<<<<< HEAD
 to_read <- paste("PHESANT/WAS/codings/",
 	dir("PHESANT/WAS/codings"), sep="")
+=======
+to_read <- paste("./WAS/codings/",
+	dir("./WAS/codings"), sep="")
+>>>>>>> updated quick_histograms to process in one chunk
 codings_tables <- list()
 
 for(i in to_read) {
@@ -180,20 +185,20 @@ get_hists_and_notes <- function(hist_filename, tsv_data, log_file, outcome_info,
 	}
 }
 
-tsv_filename <- "PHESANT/ukb7127_output"
-hist_filename <- "PHESANT/check_hist"
+tsv_filename <- "../ukb7127_output"
+hist_filename <- "../ukb7127_histograms"
 
-filename <- "PHESANT/ukb7127_output"
+filename <- "../ukb7127_output"
 tsv_filename <- paste(filename, ".tsv", sep="")
 log_file <- paste(filename, ".log", sep="")
 tsv_data <- read.table(tsv_filename, header=TRUE, sep='\t')
 
-qc_data <- read.table("PHESANT/ukb1859_qc.tsv", header=TRUE)
+qc_data <- read.table("../ukb1859_qc.tsv", header=TRUE)
 
-outcome_info <- read.table("PHESANT/variable-info/outcome_info_final.tsv",
+outcome_info <- read.table("./variable-info/outcome_info_final.tsv",
 					   sep='\t', quote="", comment.char="", header=TRUE)
 
 notes_for_manny <-  get_hists_and_notes(hist_filename, tsv_data, log_file, outcome_info, codings_tables, qc_data)
 
-write.table(notes_for_manny, file="notes_for_manny_7127.tsv", col.names=TRUE, row.names=TRUE, sep='\t', quote=FALSE)
+write.table(notes_for_manny, file="ukb7127_summary.tsv", col.names=TRUE, row.names=TRUE, sep='\t', quote=FALSE)
 
