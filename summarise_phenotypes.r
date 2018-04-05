@@ -173,46 +173,48 @@ include_PHESANT_reassignment_names <- function(pheno_summary, outcome_info)
 	where_reassignment <- which(!is.na(pheno_summary[,9]))
 	reassignments <- as.character(pheno_summary[where_reassignment,9])
 	
-	reassignments_before_after_list <- list()
-	reassignments <- gsub("reassignments: ", "", reassignments)
-	reassignments_list <- strsplit(reassignments, split="\\|")
-	for(i in 1:length(reassignments_list)) {
-		reassignments_before_after_list[[i]] <- matrix(unlist(strsplit(reassignments_list[[i]], "=")),ncol=2, byrow=TRUE)
-	}
+	if (length(reassignments) > 0) {
+		reassignments_before_after_list <- list()
+		reassignments <- gsub("reassignments: ", "", reassignments)
+		reassignments_list <- strsplit(reassignments, split="\\|")
+		for(i in 1:length(reassignments_list)) {
+			reassignments_before_after_list[[i]] <- matrix(unlist(strsplit(reassignments_list[[i]], "=")),ncol=2, byrow=TRUE)
+		}
 
-	for(i in 1:length(where_reassignment)) {
-		if(length(grep("_", pheno_summary[,1][where_reassignment[i]])) > 0) {
-			for(j in 1:nrow(reassignments_before_after_list[[i]])) {
-				if(length(grep(paste("_", reassignments_before_after_list[[i]][j,2], sep=""),
-					pheno_summary[,1][where_reassignment[i]])) > 0) {
-					# We've found this recoded variable in this row.
-					# I want to now find what this codes for - so need to find the coding table for this variable
-					# from the outcome-info file, then look at what the uncoded version of the phenotype is.
-					var <- strsplit(pheno_summary[,1][where_reassignment[i]], split="_")[[1]][1]
-					where_var <- which(outcome_info$FieldID == var)
+		for(i in 1:length(where_reassignment)) {
+			if(length(grep("_", pheno_summary[,1][where_reassignment[i]])) > 0) {
+				for(j in 1:nrow(reassignments_before_after_list[[i]])) {
+					if(length(grep(paste("_", reassignments_before_after_list[[i]][j,2], sep=""),
+						pheno_summary[,1][where_reassignment[i]])) > 0) {
+						# We've found this recoded variable in this row.
+						# I want to now find what this codes for - so need to find the coding table for this variable
+						# from the outcome-info file, then look at what the uncoded version of the phenotype is.
+						var <- strsplit(pheno_summary[,1][where_reassignment[i]], split="_")[[1]][1]
+						where_var <- which(outcome_info$FieldID == var)
 
-					i_subname <- as.character(outcome_info$Coding[where_var])
-					subvar <- reassignments_before_after_list[[i]][j,1]
+						i_subname <- as.character(outcome_info$Coding[where_var])
+						subvar <- reassignments_before_after_list[[i]][j,1]
 
-					if(nchar(i_subname)>0 && !is.na(subvar)) {
-						to_parse <- strsplit(i_subname, split="\\|")[[1]]
-						if(length(to_parse) > 1) {
-							where_subvar <- which(sapply(strsplit(trim(to_parse)," "), "[[",1) == subvar) 
-							i_subname <- ifelse(length(where_subvar) > 0,
-								get_subtype(strsplit(trim(to_parse[where_subvar])," ")[[1]]),
-								"PHESANT recoding")
-							
-							pheno_summary[where_reassignment[i],2] <- gsub("PHESANT recoding", i_subname, pheno_summary[where_reassignment[i],2])
+						if(nchar(i_subname)>0 && !is.na(subvar)) {
+							to_parse <- strsplit(i_subname, split="\\|")[[1]]
+							if(length(to_parse) > 1) {
+								where_subvar <- which(sapply(strsplit(trim(to_parse)," "), "[[",1) == subvar) 
+								i_subname <- ifelse(length(where_subvar) > 0,
+									get_subtype(strsplit(trim(to_parse[where_subvar])," ")[[1]]),
+									"PHESANT recoding")
+								
+								pheno_summary[where_reassignment[i],2] <- gsub("PHESANT recoding", i_subname, pheno_summary[where_reassignment[i],2])
+							}
 						}
-					}
-				
-					if(length(grep("Too many", i_subname))>0) {
-						# Then we need to look in the corresponding tsv_data-coding table to get the label.
-						coding <- trim(gsub("^.*id=","",i_subname))
-						where_coding <- which(codings_tables[coding][[1]]$coding == reassignments_before_after_list[[i]][j,1])
-						i_subname <- codings_tables[coding][[1]]$meaning[where_coding]
+					
+						if(length(grep("Too many", i_subname))>0) {
+							# Then we need to look in the corresponding tsv_data-coding table to get the label.
+							coding <- trim(gsub("^.*id=","",i_subname))
+							where_coding <- which(codings_tables[coding][[1]]$coding == reassignments_before_after_list[[i]][j,1])
+							i_subname <- codings_tables[coding][[1]]$meaning[where_coding]
 
-						pheno_summary[where_reassignment[i],2] <- paste(pheno_summary[where_reassignment[i],2], i_subname, sep="")
+							pheno_summary[where_reassignment[i],2] <- paste(pheno_summary[where_reassignment[i],2], i_subname, sep="")
+						}
 					}
 				}
 			}
