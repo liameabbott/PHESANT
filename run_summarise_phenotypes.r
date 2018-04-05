@@ -6,13 +6,13 @@ outcome_info <- read.table("./variable-info/outcome_info_final.tsv",
 
 for (i in seq(1, 4)) {
 
-    tsv_data_both <- read.table(paste0('../ukb31063.phesant.both_sexes.', i, '.log', header=TRUE, sep='\t')
-    tsv_data_females <- read.table(paste0('../ukb31063.phesant.female.', i, '.log', header=TRUE, sep='\t')
-    tsv_data_males <- read.table(paste0('../ukb31063.phesant.male.', i, '.log', header=TRUE, sep='\t')
+    tsv_data_both <- read.table(paste0('../ukb31063.phesant.both_sexes.', i, '.tsv'), header=TRUE, sep='\t')
+    tsv_data_females <- read.table(paste0('../ukb31063.phesant.female.', i, '.tsv'), header=TRUE, sep='\t')
+    tsv_data_males <- read.table(paste0('../ukb31063.phesant.male.', i, '.tsv'), header=TRUE, sep='\t')
 
-    log_file_both <- read.table(paste0('../ukb31063.phesant.both_sexes.', i, '.log', header=TRUE, sep='\t')
-    log_file_females <- read.table(paste0('../ukb31063.phesant.female.', i, '.log', header=TRUE, sep='\t')
-    log_file_males <- read.table(paste0('../ukb31063.phesant.male.', i, '.log', header=TRUE, sep='\t')
+    log_file_both <- read.table(paste0('../ukb31063.phesant.both_sexes.', i, '.log'), header=TRUE, sep='\t')
+    log_file_females <- read.table(paste0('../ukb31063.phesant.female.', i, '.log'), header=TRUE, sep='\t')
+    log_file_males <- read.table(paste0('../ukb31063.phesant.male.', i, '.log'), header=TRUE, sep='\t')
 
     notes_both <- get_notes(tsv_data_both, log_file_both, outcome_info, codings_tables)
     write.table(notes_both, file=paste0('../ukb31063.both_sexes.tmp.', i, '.tsv'), col.names=TRUE, row.names=FALSE, sep='\t', quote=FALSE)
