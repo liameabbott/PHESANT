@@ -7,12 +7,12 @@ trim <- function (x) {
 remove_excess_whitespace <- function(x) x <- gsub("\\s+", " ", x)
 
 # Read in all the data table codings
-to_read <- paste("~/Repositories/PHESANT/WAS/codings/",
-	dir("~/Repositories/PHESANT/WAS/codings"), sep="")
+to_read <- paste("./WAS/codings/",
+	dir("./WAS/codings"), sep="")
 codings_tables <- list()
 
 for(i in to_read) {
-	name <- gsub("~/Repositories/PHESANT/WAS/codings/coding(.*).tsv", "\\1", i)
+	name <- gsub("./WAS/codings/coding(.*).tsv", "\\1", i)
 	codings_tables[[name]] <- read.table(i, header=TRUE, sep='\t', quote="", stringsAsFactors=FALSE)
 }
 
