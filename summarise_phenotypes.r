@@ -27,16 +27,15 @@ get_notes <- function(tsv_data, log_file, outcome_info, codings_tables, start_co
 		colnames(notes) <- c("FieldID", "Field", "N.non.missing", "N.missing", "N.cases", "N.controls",
 			"Notes", "PHESANT.notes", "PHESANT.reassignments", "warning.for.case.control")
 		# Rownames are the FieldIDs
-		#rownames(notes) <- colnames(tsv_data)[start_column:ncol(tsv_data)]
 		notes[,1] = colnames(tsv_data)[start_column:ncol(tsv_data)]
 		samples <- nrow(tsv_data)
 		k <- 1
-		for(i in colnames(tsv_data)[start_column:ncol(tsv_data)]){
-			type <- class(tsv_data[i][,1])
+		for(col in colnames(tsv_data)[start_column:ncol(tsv_data)]){
+			type <- class(tsv_data[col][,1])
 			if(type == "numeric") {
-				var <- substr(i,2,nchar(i))
+				var <- substr(col, 2, nchar(col))
 				where <- which(outcome_info$FieldID == var)
-				i_name <- paste(trim(outcome_info$Field[where]),"-",i)
+				col_name <- paste(trim(outcome_info$Field[where]),"-",col)
 				# The second column is the Field name.
 				notes[k,2] <- trim(outcome_info$Field[where])
 				# The seventh column is the 'Notes' field in variable-info file:
@@ -55,9 +54,9 @@ get_notes <- function(tsv_data, log_file, outcome_info, codings_tables, start_co
 				}
 
 			} else if (type=="logical" | type=="integer") {
-				var <- strsplit(i, split="_")[[1]][1]
+				var <- strsplit(col, split="_")[[1]][1]
 				var <- substr(var, 2, nchar(var))
-				subvar <- strsplit(i, split="_")[[1]][2]
+				subvar <- strsplit(col, split="_")[[1]][2]
 				where <- which(outcome_info$FieldID == var)
 				
 				# Add the notes:
@@ -89,20 +88,20 @@ get_notes <- function(tsv_data, log_file, outcome_info, codings_tables, start_co
 					}
 				}
 
-				i_name <- paste(trim(outcome_info$Field[where]), "-", i)
+				col_name <- paste(trim(outcome_info$Field[where]), "-", col)
 
-				i_subname <- as.character(outcome_info$Coding[where])
-				if(nchar(i_subname)>0 && !is.na(subvar)) {
-					to_parse <- strsplit(i_subname, split="\\|")[[1]]
+				col_subname <- as.character(outcome_info$Coding[where])
+				if(nchar(col_subname)>0 && !is.na(subvar)) {
+					to_parse <- strsplit(col_subname, split="\\|")[[1]]
 					if(length(to_parse) > 1) {
 						where_subvar <- which(sapply(strsplit(trim(to_parse)," "), "[[",1) == subvar) 
-						i_subname <- ifelse(length(where_subvar) > 0,
+						col_subname <- ifelse(length(where_subvar) > 0,
 							get_subtype(strsplit(trim(to_parse[where_subvar])," ")[[1]]),
 							"PHESANT recoding")
 						# The first column is the Field name - if we've entered this if statement,
 						# we need to include the subfield (as the categorical has been split into 
 						# loads of booleans).
-						notes[k,2] <- paste(trim(outcome_info$Field[where]),": ",i_subname, sep="")
+						notes[k,2] <- paste(trim(outcome_info$Field[where]),": ",col_subname, sep="")
 					} else {
 						notes[k,2] <- trim(outcome_info$Field[where])
 					}
@@ -111,19 +110,18 @@ get_notes <- function(tsv_data, log_file, outcome_info, codings_tables, start_co
 					notes[k,2] <- trim(outcome_info$Field[where])
 				}
 
-				if(length(grep("Too many", i_subname))>0) {
+				if(length(grep("Too many", col_subname))>0) {
 					# Then we need to look in the corresponding tsv_data-coding table to get the label.
-					coding <- trim(gsub("^.*id=","",i_subname))
+					coding <- trim(gsub("^.*id=","",col_subname))
 					where_coding <- which(codings_tables[coding][[1]]$coding == subvar)
-					i_subname <- codings_tables[coding][[1]]$meaning[where_coding]
+					col_subname <- codings_tables[coding][[1]]$meaning[where_coding]
 					# The first column is the Field name - if we've entered this if statement,
 					# we need to include the subfield (as the categorical has been split into 
 					# loads of booleans) - this is accessed from the associated coding table for the 
 					# phenotype.
-					notes[k,2] <- paste(trim(outcome_info$Field[where]),": ",i_subname, sep="")
+					notes[k,2] <- paste(trim(outcome_info$Field[where]),": ",col_subname, sep="")
 				}
-				y <- table(tsv_data[i][,1])
-				#main <- ifelse(type=="logical", paste(i_name,"\n",i_subname), i_name)
+				y <- table(tsv_data[col][,1])
 
 				# Finally, include the case and control numbers for the logical and integer phenotypes
 				# with just two categories.
@@ -150,17 +148,19 @@ get_notes <- function(tsv_data, log_file, outcome_info, codings_tables, start_co
 
 			} else {
 				print("Error: not one of the specified types!")
+				print(type)
+				print(k)
 			}
 			# The third column is the number of missing data for this phenotype.
-			n_miss <- sum(is.na(tsv_data[i][,1]))
-			notes[i,4] <- n_miss
+			n_miss <- sum(is.na(tsv_data[col][,1]))
+			notes[k,4] <- n_miss
 			# The second column is the number of non-missing data for this phenotype.
-			n_non_miss <- sum(!is.na(tsv_data[i][,1]))
-			notes[i,3] <- n_non_miss
+			n_non_miss <- sum(!is.na(tsv_data[col][,1]))
+			notes[k,3] <- n_non_miss
 			k <- k+1
 		}
 		# Get rid of the X that's appended at the start of each variable.
-		notes[,1] <- substr(notes[,1], 2, nchar(notes[,1]))
+		notes[,1] = substr(notes[,1], 2, nchar(notes[,1]))
 		return(notes)
 	}
 }
