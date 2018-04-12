@@ -1,5 +1,4 @@
 
-library(data.table)
 source("summarise_phenotypes.r")
 
 outcome_info <- read.table("./variable-info/outcome_info_final.tsv", sep='\t', quote="", comment.char="", header=TRUE)
@@ -27,9 +26,9 @@ for (idx in seq(1, 4)) {
     write.table(notes_codings_included_both, file=paste0('../ukb31063.both_sexes.phenosummary.', idx, '.tsv'), col.names=TRUE, row.names=FALSE, sep='\t', quote=FALSE)
 
     notes_codings_included_females <- include_PHESANT_reassignment_names(paste0('../ukb31063.female.tmp.', idx, '.tsv'), outcome_info)
-    write.table(notes_codings_included_both, file=paste0('../ukb31063.female.phenosummary.', idx, '.tsv'), col.names=TRUE, row.names=FALSE, sep='\t', quote=FALSE)
+    write.table(notes_codings_included_females, file=paste0('../ukb31063.female.phenosummary.', idx, '.tsv'), col.names=TRUE, row.names=FALSE, sep='\t', quote=FALSE)
 
     notes_codings_included_males <- include_PHESANT_reassignment_names(paste0('../ukb31063.male.tmp.', idx, '.tsv'), outcome_info)
-    write.table(notes_codings_included_both, file=paste0('../ukb31063.male.phenosummary.', idx, '.tsv'), col.names=TRUE, row.names=FALSE, sep='\t', quote=FALSE)
+    write.table(notes_codings_included_males, file=paste0('../ukb31063.male.phenosummary.', idx, '.tsv'), col.names=TRUE, row.names=FALSE, sep='\t', quote=FALSE)
 
 }
